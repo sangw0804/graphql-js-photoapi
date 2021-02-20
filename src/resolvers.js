@@ -18,7 +18,11 @@ const resolvers = {
         }
     },
     Photo: {
-        url: parent => `http://test.com/photos/${parent.id}.jpg`
+        url: parent => `http://test.com/photos/${parent.id}.jpg`,
+        postedBy: parent => users.find(u => u.githubLogin === parent.githubUser)
+    },
+    User: {
+        postedPhotos: parent => photos.filter(p => p.githubUser === parent.githubLogin)
     }
 };
 
