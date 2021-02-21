@@ -2,11 +2,15 @@ const { users, photos, _id } = require('./data');
 
 const resolvers = {
     Query: {
-        totalPhotos: () => photos.length,
-        allPhotos: () => photos
+        totalPhotos: (parent, args, context) => photos.length,
+        allPhotos: (parent, args, context) => photos
     },
     Mutation: {
-        postPhoto: (parent, args) => {
+        postPhoto: (parent, args, context) => {
+            if (!context.currentUser.isLogin) {
+                return false;
+            }
+
             const created = {
                 id: _id++,
                 ...args.input
@@ -18,11 +22,11 @@ const resolvers = {
         }
     },
     Photo: {
-        url: parent => `http://test.com/photos/${parent.id}.jpg`,
-        postedBy: parent => users.find(u => u.githubLogin === parent.githubUser)
+        url: (parent, args, context) => `http://test.com/photos/${parent.id}.jpg`,
+        postedBy: (parent, args, context) => users.find(u => u.githubLogin === parent.githubUser)
     },
     User: {
-        postedPhotos: parent => photos.filter(p => p.githubUser === parent.githubLogin)
+        postedPhotos: (parent, args, context) => photos.filter(p => p.githubUser === parent.githubLogin)
     }
 };
 
